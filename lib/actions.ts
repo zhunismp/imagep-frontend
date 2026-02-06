@@ -1,10 +1,10 @@
-'use server'
 import axios from "axios"
 import { DownloadResponse, UploadResponse } from "./types"
 
 const BASE_API = "/api/v1" // TODO: read from env
 const api = axios.create({
     baseURL: BASE_API,
+    // withCredentials: true,    
 })
 
 export async function upload(
