@@ -2,10 +2,9 @@
 import axios from "axios"
 import { DownloadResponse, UploadResponse } from "./types"
 
-const BASE_API = "https://imagep-api.zhunismp.dev/api/v1" // TODO: read from env
+const BASE_API = "/api/v1" // TODO: read from env
 const api = axios.create({
     baseURL: BASE_API,
-    // withCredentials: true,    
 })
 
 export async function upload(
