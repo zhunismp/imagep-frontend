@@ -29,6 +29,52 @@ async function forceDownload(url: string, filename: string) {
   }
 }
 
+function DownloadPanelSkeleton() {
+  return (
+    <div className="mx-auto w-full max-w-6xl p-3 sm:p-5 space-y-3 animate-fade-in">
+      <div className="rounded-2xl border bg-white shadow-sm p-4 sm:p-5 space-y-3">
+        <div className="h-4 w-28 bg-slate-200 rounded animate-pulse-soft" />
+        <div className="h-6 w-64 bg-slate-200 rounded animate-pulse-soft" />
+        <div className="h-4 w-48 bg-slate-200 rounded animate-pulse-soft" />
+
+        <div className="mt-3 h-2 rounded-full bg-slate-100 overflow-hidden">
+          <div className="h-full w-1/3 bg-slate-200 animate-pulse-soft" />
+        </div>
+      </div>
+
+      <div className="rounded-2xl border bg-white shadow-sm overflow-hidden">
+        <div className="px-4 sm:px-5 py-3 border-b flex items-center justify-between">
+          <div className="h-4 w-28 bg-slate-200 rounded animate-pulse-soft" />
+        </div>
+
+        <div className="p-3 sm:p-5 space-y-3">
+          <div className="h-4 w-40 bg-slate-200 rounded animate-pulse-soft" />
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
+            {[...Array(6)].map((_, i) => (
+              <div
+                key={i}
+                className="h-12 rounded-2xl bg-slate-200 animate-pulse-soft"
+              />
+            ))}
+          </div>
+
+          <div className="pt-4">
+            <div className="h-4 w-32 bg-slate-200 rounded animate-pulse-soft" />
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
+            {[...Array(3)].map((_, i) => (
+              <div
+                key={`f-${i}`}
+                className="h-12 rounded-2xl bg-slate-200 animate-pulse-soft"
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function DownloadPanel({ taskId }: { taskId: string }) {
   const { data, isPending, isError, error, isFetching, refetch } = useQuery({
     queryKey: ["download", taskId],
@@ -50,19 +96,47 @@ export default function DownloadPanel({ taskId }: { taskId: string }) {
         richColors: true,
         position: "top-right",
       });
+    } else {
+      toast.success("Download started", { richColors: true, position: "top-right" });
     }
   }, []);
 
-  if (isPending) return <div className="p-6">Loading…</div>;
-  if (isError) return <div className="p-6 text-red-600">Error: {error.message}</div>;
-  if (!data) return <div className="p-6">No data</div>;
+  if (isPending) return <DownloadPanelSkeleton />;
+
+  if (isError)
+    return (
+      <div className="mx-auto w-full max-w-6xl p-3 sm:p-5 animate-fade-in">
+        <div className="rounded-2xl border bg-white shadow-sm p-4 sm:p-5">
+          <div className="text-sm text-slate-500">Download</div>
+          <div className="mt-1 text-red-600 font-medium">
+            Error: {error.message}
+          </div>
+          <button
+            onClick={() => refetch()}
+            className="mt-4 inline-flex items-center gap-2 rounded-xl border bg-white px-3 py-2 text-sm hover:bg-slate-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`} />
+            Try again
+          </button>
+        </div>
+      </div>
+    );
+
+  if (!data)
+    return (
+      <div className="mx-auto w-full max-w-6xl p-3 sm:p-5 animate-fade-in">
+        <div className="rounded-2xl border bg-white shadow-sm p-4 sm:p-5">
+          No data
+        </div>
+      </div>
+    );
 
   const done = data.progress.completed;
   const total = data.progress.total;
   const percent = total ? Math.round((done / total) * 100) : 0;
 
   return (
-    <div className="mx-auto w-full max-w-6xl p-3 sm:p-5 space-y-3">
+    <div className="mx-auto w-full max-w-6xl p-3 sm:p-5 space-y-3 animate-fade-in">
       {/* Header */}
       <div className="rounded-2xl border bg-white shadow-sm p-4 sm:p-5">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -72,8 +146,8 @@ export default function DownloadPanel({ taskId }: { taskId: string }) {
               Task #{data.taskId}
             </div>
             <div className="mt-1 text-sm text-slate-600">
-              {data.isCompleted ? "Completed ✅" : "Processing…"} {isFetching ? "↻" : ""} •{" "}
-              {done}/{total} ({percent}%)
+              {data.isCompleted ? "Completed ✅" : "Processing…"}{" "}
+              {isFetching ? "↻" : ""} • {done}/{total} ({percent}%)
             </div>
           </div>
 
@@ -88,7 +162,7 @@ export default function DownloadPanel({ taskId }: { taskId: string }) {
 
         <div className="mt-3 h-2 rounded-full bg-slate-100 overflow-hidden">
           <div
-            className="h-full bg-slate-900 transition-[width] duration-300"
+            className="h-full bg-slate-900 transition-all duration-500 ease-out"
             style={{ width: `${percent}%` }}
           />
         </div>
@@ -111,11 +185,12 @@ export default function DownloadPanel({ taskId }: { taskId: string }) {
               <div className="text-sm text-slate-500">No completed files yet.</div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
-                {completed.map((f) => (
+                {completed.map((f, i) => (
                   <button
                     key={f.fileId}
                     onClick={() => onDownloadOne(f.signedUrl, f.filename)}
-                    className="text-left rounded-2xl border bg-white p-3 hover:bg-slate-50 active:scale-[0.99] transition"
+                    style={{ animationDelay: `${i * 40}ms` }}
+                    className="animate-fade-in text-left rounded-2xl border bg-white p-3 hover:bg-slate-50 active:scale-[0.99] transition"
                   >
                     <div className="flex items-center gap-2">
                       <div className="h-8 w-8 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
@@ -142,10 +217,11 @@ export default function DownloadPanel({ taskId }: { taskId: string }) {
               <div className="text-sm text-slate-500">No failed files 🎉</div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
-                {failed.map((f: any) => (
+                {failed.map((f: any, i) => (
                   <div
                     key={f.fileId ?? f.filename}
-                    className="rounded-2xl border border-rose-200 bg-rose-50/60 p-3"
+                    style={{ animationDelay: `${i * 40}ms` }}
+                    className="animate-fade-in rounded-2xl border border-rose-200 bg-rose-50/60 p-3"
                   >
                     <div className="flex items-center gap-2">
                       <div className="h-8 w-8 rounded-xl bg-rose-100 flex items-center justify-center shrink-0">
