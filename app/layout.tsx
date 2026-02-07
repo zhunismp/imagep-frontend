@@ -75,7 +75,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               <div className="md:col-span-5 flex md:justify-end">
                 <div className="w-full md:w-auto space-y-3">
                   <a
-                    href="https://github.com/YOUR_USERNAME/YOUR_REPO"
+                    href="https://github.com/zhunismp/imagep-frontend"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl border bg-slate-50 hover:bg-slate-100 transition font-medium text-slate-900"
