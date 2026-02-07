@@ -47,13 +47,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <div className="grid gap-10 md:grid-cols-12">
               {/* Left */}
               <div className="md:col-span-7 space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="h-9 w-9 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold">
-                    IP
-                  </div>
-                  <div className="font-semibold text-slate-900">Imagep</div>
-                </div>
-
                 <p className="text-slate-500 max-w-2xl">
                   Open-source image compression pipeline built for speed and privacy.
                   Compress JPG & PNG instantly in your browser.
